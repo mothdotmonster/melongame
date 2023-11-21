@@ -63,11 +63,15 @@ Composite.add(engine.world, mouseConstraint);
 // keep the mouse in sync with rendering
 render.mouse = mouse;
 
+// start score counting
+let score = 0
+
+// initialize click timeout
+let lastClick = 0
 
 // spawn balls on click
 Matter.Events.on(mouseConstraint, 'mouseup', function (event) {
 	var mousePosition = event.mouse.position
-	//console.log('click at ' + mousePosition.x + ' ' + mousePosition.y)
 
 	let dropX // drop X position is limited to inside the play area
 	mousePosition.x > (vw/2+185) ? 
@@ -81,7 +85,12 @@ Matter.Events.on(mouseConstraint, 'mouseup', function (event) {
 		},
 		friction: 0
 	})
-	Composite.add(engine.world, circle)
+
+	// only drop if it's been 2 seconds since the last one
+	if (lastClick < Date.now()-2000) {
+		Composite.add(engine.world, circle)
+		lastClick = Date.now()
+	}
 })
 
 // handle collisions
@@ -106,6 +115,10 @@ Events.on(engine, 'collisionStart', function(event) {
 				pair.bodyA.render.fillStyle == 'blue' ?
 					pair.bodyA.render.fillStyle = 'purple' :
 					pair.bodyA.render.fillStyle = 'pink'
+				
+				// temporary score system, flesh out later
+				score += 1
+				console.log(score)
 			}
 
 			if (pair.bodyA.label == 'deathplane' || pair.bodyB.label == 'deathplane') {
