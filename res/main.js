@@ -1,13 +1,15 @@
 // aliases
 var Engine = Matter.Engine,
-		Render = Matter.Render,
-		Runner = Matter.Runner,
-		Body = Matter.Body,
-		Events = Matter.Events,
-		MouseConstraint = Matter.MouseConstraint,
-		Mouse = Matter.Mouse,
-		Composite = Matter.Composite,
-		Bodies = Matter.Bodies
+	Render = Matter.Render,
+	Runner = Matter.Runner,
+	Body = Matter.Body,
+	Events = Matter.Events,
+	Composite = Matter.Composite,
+	Composites = Matter.Composites,
+	Common = Matter.Common,
+	MouseConstraint = Matter.MouseConstraint,
+	Mouse = Matter.Mouse,
+	Bodies = Matter.Bodies;
 
 const vw = window.innerWidth
 const vh = window.innerHeight
@@ -60,10 +62,13 @@ Composite.add(engine.world, mouseConstraint);
 // keep the mouse in sync with rendering
 render.mouse = mouse;
 
+
+// spawn balls on click
 Matter.Events.on(mouseConstraint, 'mouseup', function (event) {
 	var mousePosition = event.mouse.position
 	//console.log('click at ' + mousePosition.x + ' ' + mousePosition.y)
-	let dropX
+
+	let dropX // drop X position is limited to inside the play area
 	mousePosition.x > (vw/2+185) ? 
 		dropX = (vw/2+185) : 
 	mousePosition.x < (vw/2-185) ? 
@@ -76,3 +81,54 @@ Matter.Events.on(mouseConstraint, 'mouseup', function (event) {
 	})
 	Composite.add(engine.world, circle)
 })
+
+// handle collisions
+Events.on(engine, 'collisionStart', function(event) {
+	var pairs = event.pairs;
+	// iterate over collision pairs
+	for (var i = 0; i < pairs.length; i++) {
+			var pair = pairs[i];
+			// check if the collision is between two same-size objects
+			if (pair.bodyA.render.fillStyle == pair.bodyB.render.fillStyle && pair.bodyA.render.fillStyle != 'pink') {
+				Composite.remove(engine.world, pair.bodyB) // remove one of them
+				Body.scale(pair.bodyA, 1.5, 1.5) // enlarge the other one
+				// change color (this is a bad way to do it)
+				pair.bodyA.render.fillStyle == 'red' ?
+					pair.bodyA.render.fillStyle = 'orange' :
+				pair.bodyA.render.fillStyle == 'orange' ?
+					pair.bodyA.render.fillStyle = 'yellow' :
+				pair.bodyA.render.fillStyle == 'yellow' ?
+					pair.bodyA.render.fillStyle = 'green' :
+				pair.bodyA.render.fillStyle == 'green' ?
+					pair.bodyA.render.fillStyle = 'blue' :
+				pair.bodyA.render.fillStyle == 'blue' ?
+					pair.bodyA.render.fillStyle = 'purple' :
+					pair.bodyA.render.fillStyle = 'pink'
+			}
+	}
+});
+
+Events.on(engine, 'collisionActive', function(event) {
+	var pairs = event.pairs;
+	// iterate over collision pairs
+	for (var i = 0; i < pairs.length; i++) {
+			var pair = pairs[i];
+			// check if the collision is between two same-size objects
+			if (pair.bodyA.render.fillStyle == pair.bodyB.render.fillStyle && pair.bodyA.render.fillStyle != 'pink') {
+				Composite.remove(engine.world, pair.bodyB) // remove one of them
+				Body.scale(pair.bodyA, 1.5, 1.5) // enlarge the other one
+				// change color (this is a bad way to do it)
+				pair.bodyA.render.fillStyle == 'red' ?
+					pair.bodyA.render.fillStyle = 'orange' :
+				pair.bodyA.render.fillStyle == 'orange' ?
+					pair.bodyA.render.fillStyle = 'yellow' :
+				pair.bodyA.render.fillStyle == 'yellow' ?
+					pair.bodyA.render.fillStyle = 'green' :
+				pair.bodyA.render.fillStyle == 'green' ?
+					pair.bodyA.render.fillStyle = 'blue' :
+				pair.bodyA.render.fillStyle == 'blue' ?
+					pair.bodyA.render.fillStyle = 'purple' :
+					pair.bodyA.render.fillStyle = 'pink'
+			}
+	}
+});
