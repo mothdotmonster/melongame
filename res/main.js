@@ -30,11 +30,12 @@ var render = Render.create({
 });
 
 // create playfield
-var leftWall = Bodies.rectangle((vw/2-250), (vh/2), 100, 500, { isStatic: true })
-var rightWall = Bodies.rectangle((vw/2+250), (vh/2), 100, 500, { isStatic: true })
-var ground = Bodies.rectangle((vw/2), (vh/2+300), 600, 100, { isStatic: true });
+var leftWall = Bodies.rectangle((vw/2-250), (vh/2), 100, 500, { isStatic: true, friction: 0 })
+var rightWall = Bodies.rectangle((vw/2+250), (vh/2), 100, 500, { isStatic: true, friction: 0 })
+var ground = Bodies.rectangle((vw/2), (vh/2+300), 600, 100, { isStatic: true, friction: 0 })
+var deathplane = Bodies.rectangle((vw/2), (vh/2+500), 100000, 100, { isStatic: true, friction: 0, render: { visible: false }, label: 'deathplane' })
 
-Composite.add(engine.world, [ground, leftWall, rightWall]);
+Composite.add(engine.world, [ground, leftWall, rightWall, deathplane]);
 
 // run the renderer
 Render.run(render);
@@ -74,10 +75,11 @@ Matter.Events.on(mouseConstraint, 'mouseup', function (event) {
 	mousePosition.x < (vw/2-185) ? 
 		dropX = (vw/2-185) : dropX = mousePosition.x
 
-	var circle = Bodies.circle ( dropX, (vh/2-280), 15, {
+	var circle = Bodies.circle ( dropX, (vh/2-400), 15, {
 		render: {
 			fillStyle: 'red'
-		}
+		},
+		friction: 0
 	})
 	Composite.add(engine.world, circle)
 })
@@ -104,6 +106,10 @@ Events.on(engine, 'collisionStart', function(event) {
 				pair.bodyA.render.fillStyle == 'blue' ?
 					pair.bodyA.render.fillStyle = 'purple' :
 					pair.bodyA.render.fillStyle = 'pink'
+			}
+
+			if (pair.bodyA.label == 'deathplane' || pair.bodyB.label == 'deathplane') {
+				Runner.stop(runner)
 			}
 	}
 });
