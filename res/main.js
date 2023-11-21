@@ -28,9 +28,9 @@ var render = Render.create({
 });
 
 // create playfield
-var leftWall = Bodies.rectangle((vw/2-200), (vh/2), 10, 500, { isStatic: true })
-var rightWall = Bodies.rectangle((vw/2+200), (vh/2), 10, 500, { isStatic: true })
-var ground = Bodies.rectangle((vw/2), (vh/2+250), 410, 10, { isStatic: true });
+var leftWall = Bodies.rectangle((vw/2-250), (vh/2), 100, 500, { isStatic: true })
+var rightWall = Bodies.rectangle((vw/2+250), (vh/2), 100, 500, { isStatic: true })
+var ground = Bodies.rectangle((vw/2), (vh/2+300), 600, 100, { isStatic: true });
 
 Composite.add(engine.world, [ground, leftWall, rightWall]);
 
@@ -62,7 +62,17 @@ render.mouse = mouse;
 
 Matter.Events.on(mouseConstraint, 'mouseup', function (event) {
 	var mousePosition = event.mouse.position
-	console.log('click at ' + mousePosition.x + ' ' + mousePosition.y)
-	var circle = Bodies.circle (mousePosition.x, mousePosition.y, 15)
+	//console.log('click at ' + mousePosition.x + ' ' + mousePosition.y)
+	let dropX
+	mousePosition.x > (vw/2+185) ? 
+		dropX = (vw/2+185) : 
+	mousePosition.x < (vw/2-185) ? 
+		dropX = (vw/2-185) : dropX = mousePosition.x
+
+	var circle = Bodies.circle ( dropX, (vh/2-280), 15, {
+		render: {
+			fillStyle: 'red'
+		}
+	})
 	Composite.add(engine.world, circle)
 })
