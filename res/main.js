@@ -14,6 +14,10 @@ var Engine = Matter.Engine,
 const vw = window.innerWidth
 const vh = window.innerHeight
 
+let scoreDisplay = document.querySelector('#score')
+let nextDisplay = document.querySelector('#next')
+let uiOuter = document.querySelector('#ui-outer')
+
 // create an engine
 var engine = Engine.create();
 
@@ -69,6 +73,9 @@ let score = 0
 // initialize click timeout
 let lastClick = 0
 
+// seed RNG
+nextBall = 0
+
 // spawn balls on click
 Matter.Events.on(mouseConstraint, 'mouseup', function (event) {
 	var mousePosition = event.mouse.position
@@ -79,16 +86,42 @@ Matter.Events.on(mouseConstraint, 'mouseup', function (event) {
 	mousePosition.x < (vw/2-185) ? 
 		dropX = (vw/2-185) : dropX = mousePosition.x
 
-	var circle = Bodies.circle ( dropX, (vh/2-400), 15, {
+	// ste up the balls for dropping
+	var circle0 = Bodies.circle ( dropX, (vh/2-400), 15, {
 		render: {
 			fillStyle: 'red'
 		},
 		friction: 0
 	})
+	var circle1 = Bodies.circle ( dropX, (vh/2-400), 15 * 1.25, {
+		render: {
+			fillStyle: 'orange'
+		},
+		friction: 0
+	})
+	var circle2 = Bodies.circle ( dropX, (vh/2-400), 15 * 1.25 * 1.25, {
+		render: {
+			fillStyle: 'yellow'
+		},
+		friction: 0
+	})
 
-	// only drop if it's been 2 seconds since the last one
-	if (lastClick < Date.now()-2000) {
-		Composite.add(engine.world, circle)
+	// only drop if it's been 1 seconds since the last drop
+	if (lastClick < Date.now()-1000) {
+		nextBall == 0 ?
+			Composite.add(engine.world, circle0) :
+		nextBall == 1 ?
+			Composite.add(engine.world, circle1) :
+			Composite.add(engine.world, circle2)
+		nextBall = Math.floor(Math.random() * 2.1)
+
+		// change next ball display
+		nextBall == 0 ?
+			nextDisplay.innerHTML = "red" :
+		nextBall == 1 ?
+			nextDisplay.innerHTML = "orange" :
+			nextDisplay.innerHTML = "yellow"
+
 		lastClick = Date.now()
 	}
 })
@@ -100,54 +133,135 @@ Events.on(engine, 'collisionStart', function(event) {
 	for (var i = 0; i < pairs.length; i++) {
 			var pair = pairs[i];
 			// check if the collision is between two same-size objects
-			if (pair.bodyA.render.fillStyle == pair.bodyB.render.fillStyle && pair.bodyA.render.fillStyle != 'pink') {
+			if (pair.bodyA.render.fillStyle == pair.bodyB.render.fillStyle && pair.bodyA.render.fillStyle != 'olive') {
 				Composite.remove(engine.world, pair.bodyB) // remove one of them
-				Body.scale(pair.bodyA, 1.5, 1.5) // enlarge the other one
-				// change color (this is a bad way to do it)
-				pair.bodyA.render.fillStyle == 'red' ?
-					pair.bodyA.render.fillStyle = 'orange' :
-				pair.bodyA.render.fillStyle == 'orange' ?
-					pair.bodyA.render.fillStyle = 'yellow' :
-				pair.bodyA.render.fillStyle == 'yellow' ?
-					pair.bodyA.render.fillStyle = 'green' :
-				pair.bodyA.render.fillStyle == 'green' ?
-					pair.bodyA.render.fillStyle = 'blue' :
-				pair.bodyA.render.fillStyle == 'blue' ?
-					pair.bodyA.render.fillStyle = 'purple' :
-					pair.bodyA.render.fillStyle = 'pink'
-				
-				// temporary score system, flesh out later
-				score += 1
-				console.log(score)
-			}
+				Body.scale(pair.bodyA, 1.25, 1.25) // enlarge the other one
 
+				// change color (TODO: add sprites instead)
+				switch (pair.bodyA.render.fillStyle) {
+					case 'red':
+						pair.bodyA.render.fillStyle = 'orange'
+						break
+					case 'orange':
+						pair.bodyA.render.fillStyle = 'yellow'
+						break
+					case 'yellow':
+						pair.bodyA.render.fillStyle = 'yellowgreen'
+						break
+					case 'yellowgreen':
+						pair.bodyA.render.fillStyle = 'lime'
+						break
+					case 'lime':
+						pair.bodyA.render.fillStyle = 'green'
+						break
+					case 'green':
+						pair.bodyA.render.fillStyle = 'blue'
+						break
+					case 'blue':
+						pair.bodyA.render.fillStyle = 'indigo'
+						break
+					case 'indigo':
+						pair.bodyA.render.fillStyle = 'blueviolet'
+						break
+					case 'blueviolet':
+						pair.bodyA.render.fillStyle = 'purple'
+						break
+					case 'purple':
+						pair.bodyA.render.fillStyle = 'magenta'
+						break
+					case 'magenta':
+						pair.bodyA.render.fillStyle = 'pink'
+						break
+					case 'pink':
+						pair.bodyA.render.fillStyle = 'aliceblue'
+						break
+					case 'aliceblue':
+						pair.bodyA.render.fillStyle = 'lightgreen'
+						break
+					case 'lighrgreen':
+						pair.bodyA.render.fillStyle = 'gold'
+						break
+					case 'gold':
+						pair.bodyA.render.fillStyle = 'olive'
+						break
+				}
+				
+				// temporary score system, add some combos and stuff later
+				score += 1
+				scoreDisplay.innerHTML = score
+			}
+			
+			// game over
 			if (pair.bodyA.label == 'deathplane' || pair.bodyB.label == 'deathplane') {
-				Runner.stop(runner)
+				Runner.stop(runner) // stop game
+				nextDisplay.innerHTML = "game over" // let the player know what happen
+				uiOuter.style.cssText += 'background-image: linear-gradient(0deg, lightgrey 16.67%, transparent 16.67%, transparent 50%, lightgrey 50%, lightgrey 66.67%, transparent 66.67%, transparent 100%); background-size: 12.00px 12.00px;;'
 			}
 	}
 });
 
+// TOOD: figure out how to not copy and paste so much code like a moron
 Events.on(engine, 'collisionActive', function(event) {
 	var pairs = event.pairs;
 	// iterate over collision pairs
 	for (var i = 0; i < pairs.length; i++) {
 			var pair = pairs[i];
 			// check if the collision is between two same-size objects
-			if (pair.bodyA.render.fillStyle == pair.bodyB.render.fillStyle && pair.bodyA.render.fillStyle != 'pink') {
+			if (pair.bodyA.render.fillStyle == pair.bodyB.render.fillStyle && pair.bodyA.render.fillStyle != 'olive') {
 				Composite.remove(engine.world, pair.bodyB) // remove one of them
-				Body.scale(pair.bodyA, 1.5, 1.5) // enlarge the other one
-				// change color (this is a bad way to do it)
-				pair.bodyA.render.fillStyle == 'red' ?
-					pair.bodyA.render.fillStyle = 'orange' :
-				pair.bodyA.render.fillStyle == 'orange' ?
-					pair.bodyA.render.fillStyle = 'yellow' :
-				pair.bodyA.render.fillStyle == 'yellow' ?
-					pair.bodyA.render.fillStyle = 'green' :
-				pair.bodyA.render.fillStyle == 'green' ?
-					pair.bodyA.render.fillStyle = 'blue' :
-				pair.bodyA.render.fillStyle == 'blue' ?
-					pair.bodyA.render.fillStyle = 'purple' :
-					pair.bodyA.render.fillStyle = 'pink'
+				Body.scale(pair.bodyA, 1.25, 1.25) // enlarge the other one
+
+				// change color (TODO: add sprites instead)
+				switch (pair.bodyA.render.fillStyle) {
+					case 'red':
+						pair.bodyA.render.fillStyle = 'orange'
+						break
+					case 'orange':
+						pair.bodyA.render.fillStyle = 'yellow'
+						break
+					case 'yellow':
+						pair.bodyA.render.fillStyle = 'yellowgreen'
+						break
+					case 'yellowgreen':
+						pair.bodyA.render.fillStyle = 'lime'
+						break
+					case 'lime':
+						pair.bodyA.render.fillStyle = 'green'
+						break
+					case 'green':
+						pair.bodyA.render.fillStyle = 'blue'
+						break
+					case 'blue':
+						pair.bodyA.render.fillStyle = 'indigo'
+						break
+					case 'indigo':
+						pair.bodyA.render.fillStyle = 'blueviolet'
+						break
+					case 'blueviolet':
+						pair.bodyA.render.fillStyle = 'purple'
+						break
+					case 'purple':
+						pair.bodyA.render.fillStyle = 'magenta'
+						break
+					case 'magenta':
+						pair.bodyA.render.fillStyle = 'pink'
+						break
+					case 'pink':
+						pair.bodyA.render.fillStyle = 'aliceblue'
+						break
+					case 'aliceblue':
+						pair.bodyA.render.fillStyle = 'lightgreen'
+						break
+					case 'lightgreen':
+						pair.bodyA.render.fillStyle = 'gold'
+						break
+					case 'gold':
+						pair.bodyA.render.fillStyle = 'olive'
+						break
+				}
+
+				score += 1
+				scoreDisplay.innerHTML = score
 			}
 	}
 });

@@ -2,11 +2,24 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8" />
-	<title>MELON GAME</title>
-	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>melongame v0.1.0</title>
+	<meta name="viewport" content="width=device-width,initial-scale=.5" />
+	<meta name="description" content="minimalist suika-like browser game, free in your browser">
 	<link rel="stylesheet" href="/res/style.css">
 </head>
 <body>
+	<div id="ui-outer">
+		<div id="ui-container">
+			<div id="score-container">
+				<div id="score-label">score</div>
+				<div id="score">0</div>
+			</div>
+			<div id="next-container">
+				<div id="next-label">next</div>
+				<div id="next">red</div>
+			</div>
+		</div>
+	</div>
 	<script src="/lib/matter.js"></script>
 	<script src="/res/main.js"></script>
 </body>
