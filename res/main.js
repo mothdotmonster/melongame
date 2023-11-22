@@ -189,6 +189,7 @@ Events.on(engine, 'collisionStart', function(event) {
 				// temporary score system, add some combos and stuff later
 				score += 1
 				scoreDisplay.innerHTML = score
+				break // prevent ball duplication
 			}
 			
 			// game over
@@ -262,6 +263,7 @@ Events.on(engine, 'collisionActive', function(event) {
 
 				score += 1
 				scoreDisplay.innerHTML = score
+				break
 			}
 	}
 });
