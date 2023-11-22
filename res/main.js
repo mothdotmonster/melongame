@@ -45,7 +45,9 @@ Composite.add(engine.world, [ground, leftWall, rightWall, deathplane]);
 Render.run(render);
 
 // create runner
-var runner = Runner.create();
+var runner = Runner.create({
+  isFixed: true,
+});
 
 // run the engine
 Runner.run(runner, engine);
