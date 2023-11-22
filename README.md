@@ -2,4 +2,4 @@
 
 live version: https://melongame.moth.monster/
 
-WIP suika-like using matter.js
+minimalist suika-like browser game
