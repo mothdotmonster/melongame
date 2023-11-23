@@ -106,8 +106,8 @@ Matter.Events.on(mouseConstraint, 'mouseup', function (event) {
 		friction: 0
 	})
 
-	// only drop if it's been 1 seconds since the last drop
-	if (lastClick < Date.now()-1000) {
+	// only drop if it's been .5 seconds since the last drop
+	if (lastClick < Date.now()-500) {
 		nextBall == 0 ?
 			Composite.add(engine.world, circle0) :
 		nextBall == 1 ?
