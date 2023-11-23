@@ -48,3 +48,15 @@ html, body {
 #score, #next {
 	font-size: 3rem;
 }
+
+@media screen and (max-width: 1000px) {
+	#score, #next {
+		font-size: 5rem;
+	}
+	#score-label, #next-label {
+		font-size: 2rem;
+	}
+	#ui-container {
+		top: calc(50vh - 450px);
+	}
+}
