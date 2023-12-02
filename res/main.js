@@ -73,8 +73,15 @@ let score = 0
 // initialize click timeout
 let lastClick = 0
 
+// initialize combo multiplier
+let combo = 1
+let lastMerge = 0
+
 // seed RNG
-nextBall = 0
+let nextBall = 0
+
+// greets to MATRIXXX_ on freesound
+let click = new Audio('/res/703884.wav')
 
 // spawn balls on click
 Matter.Events.on(mouseConstraint, 'mouseup', function (event) {
@@ -122,148 +129,101 @@ Matter.Events.on(mouseConstraint, 'mouseup', function (event) {
 			nextDisplay.innerHTML = "orange" :
 			nextDisplay.innerHTML = "yellow"
 
+		// update timer
 		lastClick = Date.now()
 	}
 })
 
+function doCollision(event){
+	var pairs = event.pairs;
+	// iterate over collision pairs
+	for (var i = 0; i < pairs.length; i++) {
+		var pair = pairs[i];
+		// check if the collision is between two same-size objects
+		if (pair.bodyA.render.fillStyle == pair.bodyB.render.fillStyle && pair.bodyA.render.fillStyle != 'olive') {
+			Composite.remove(engine.world, pair.bodyB) // remove one of them
+			Body.scale(pair.bodyA, 1.25, 1.25) // enlarge the other one
+
+			// change color (TODO: add sprites instead?)
+			switch (pair.bodyA.render.fillStyle) {
+				case 'red':
+					pair.bodyA.render.fillStyle = 'orange'
+					break
+				case 'orange':
+					pair.bodyA.render.fillStyle = 'yellow'
+					break
+				case 'yellow':
+					pair.bodyA.render.fillStyle = 'yellowgreen'
+					break
+				case 'yellowgreen':
+					pair.bodyA.render.fillStyle = 'lime'
+					break
+				case 'lime':
+					pair.bodyA.render.fillStyle = 'green'
+					break
+				case 'green':
+					pair.bodyA.render.fillStyle = 'blue'
+					break
+				case 'blue':
+					pair.bodyA.render.fillStyle = 'indigo'
+					break
+				case 'indigo':
+					pair.bodyA.render.fillStyle = 'blueviolet'
+					break
+				case 'blueviolet':
+					pair.bodyA.render.fillStyle = 'purple'
+					break
+				case 'purple':
+					pair.bodyA.render.fillStyle = 'magenta'
+					break
+				case 'magenta':
+					pair.bodyA.render.fillStyle = 'pink'
+					break
+				case 'pink':
+					pair.bodyA.render.fillStyle = 'aliceblue'
+					break
+				case 'aliceblue':
+					pair.bodyA.render.fillStyle = 'lightgreen'
+					break
+				case 'lighrgreen':
+					pair.bodyA.render.fillStyle = 'gold'
+					break
+				case 'gold':
+					pair.bodyA.render.fillStyle = 'olive'
+					break
+			}
+
+			// simple combos, double score added every merge between clicks
+			if (lastMerge > lastClick) {
+				combo *= 2
+			} else {
+				combo = 1
+			}
+			score += combo
+			lastMerge = Date.now()
+
+			// display new score
+			scoreDisplay.innerHTML = score
+
+			// fun sound!
+			click.play();
+
+			break // prevent ball duplication
+		}
+		
+		// game over
+		if (pair.bodyA.label == 'deathplane' || pair.bodyB.label == 'deathplane') {
+			Runner.stop(runner) // stop game
+			nextDisplay.innerHTML = "game over" // let the player know what happen
+			uiOuter.style.cssText += 'background-image: linear-gradient(0deg, lightgrey 16.67%, transparent 16.67%, transparent 50%, lightgrey 50%, lightgrey 66.67%, transparent 66.67%, transparent 100%); background-size: 12.00px 12.00px;;'
+		}
+	}
+}
+
 // handle collisions
 Events.on(engine, 'collisionStart', function(event) {
-	var pairs = event.pairs;
-	// iterate over collision pairs
-	for (var i = 0; i < pairs.length; i++) {
-			var pair = pairs[i];
-			// check if the collision is between two same-size objects
-			if (pair.bodyA.render.fillStyle == pair.bodyB.render.fillStyle && pair.bodyA.render.fillStyle != 'olive') {
-				Composite.remove(engine.world, pair.bodyB) // remove one of them
-				Body.scale(pair.bodyA, 1.25, 1.25) // enlarge the other one
-
-				// change color (TODO: add sprites instead)
-				switch (pair.bodyA.render.fillStyle) {
-					case 'red':
-						pair.bodyA.render.fillStyle = 'orange'
-						break
-					case 'orange':
-						pair.bodyA.render.fillStyle = 'yellow'
-						break
-					case 'yellow':
-						pair.bodyA.render.fillStyle = 'yellowgreen'
-						break
-					case 'yellowgreen':
-						pair.bodyA.render.fillStyle = 'lime'
-						break
-					case 'lime':
-						pair.bodyA.render.fillStyle = 'green'
-						break
-					case 'green':
-						pair.bodyA.render.fillStyle = 'blue'
-						break
-					case 'blue':
-						pair.bodyA.render.fillStyle = 'indigo'
-						break
-					case 'indigo':
-						pair.bodyA.render.fillStyle = 'blueviolet'
-						break
-					case 'blueviolet':
-						pair.bodyA.render.fillStyle = 'purple'
-						break
-					case 'purple':
-						pair.bodyA.render.fillStyle = 'magenta'
-						break
-					case 'magenta':
-						pair.bodyA.render.fillStyle = 'pink'
-						break
-					case 'pink':
-						pair.bodyA.render.fillStyle = 'aliceblue'
-						break
-					case 'aliceblue':
-						pair.bodyA.render.fillStyle = 'lightgreen'
-						break
-					case 'lighrgreen':
-						pair.bodyA.render.fillStyle = 'gold'
-						break
-					case 'gold':
-						pair.bodyA.render.fillStyle = 'olive'
-						break
-				}
-				
-				// temporary score system, add some combos and stuff later
-				score += 1
-				scoreDisplay.innerHTML = score
-				break // prevent ball duplication
-			}
-			
-			// game over
-			if (pair.bodyA.label == 'deathplane' || pair.bodyB.label == 'deathplane') {
-				Runner.stop(runner) // stop game
-				nextDisplay.innerHTML = "game over" // let the player know what happen
-				uiOuter.style.cssText += 'background-image: linear-gradient(0deg, lightgrey 16.67%, transparent 16.67%, transparent 50%, lightgrey 50%, lightgrey 66.67%, transparent 66.67%, transparent 100%); background-size: 12.00px 12.00px;;'
-			}
-	}
+	doCollision(event)
 });
-
-// TOOD: figure out how to not copy and paste so much code like a moron
 Events.on(engine, 'collisionActive', function(event) {
-	var pairs = event.pairs;
-	// iterate over collision pairs
-	for (var i = 0; i < pairs.length; i++) {
-			var pair = pairs[i];
-			// check if the collision is between two same-size objects
-			if (pair.bodyA.render.fillStyle == pair.bodyB.render.fillStyle && pair.bodyA.render.fillStyle != 'olive') {
-				Composite.remove(engine.world, pair.bodyB) // remove one of them
-				Body.scale(pair.bodyA, 1.25, 1.25) // enlarge the other one
-
-				// change color (TODO: add sprites instead)
-				switch (pair.bodyA.render.fillStyle) {
-					case 'red':
-						pair.bodyA.render.fillStyle = 'orange'
-						break
-					case 'orange':
-						pair.bodyA.render.fillStyle = 'yellow'
-						break
-					case 'yellow':
-						pair.bodyA.render.fillStyle = 'yellowgreen'
-						break
-					case 'yellowgreen':
-						pair.bodyA.render.fillStyle = 'lime'
-						break
-					case 'lime':
-						pair.bodyA.render.fillStyle = 'green'
-						break
-					case 'green':
-						pair.bodyA.render.fillStyle = 'blue'
-						break
-					case 'blue':
-						pair.bodyA.render.fillStyle = 'indigo'
-						break
-					case 'indigo':
-						pair.bodyA.render.fillStyle = 'blueviolet'
-						break
-					case 'blueviolet':
-						pair.bodyA.render.fillStyle = 'purple'
-						break
-					case 'purple':
-						pair.bodyA.render.fillStyle = 'magenta'
-						break
-					case 'magenta':
-						pair.bodyA.render.fillStyle = 'pink'
-						break
-					case 'pink':
-						pair.bodyA.render.fillStyle = 'aliceblue'
-						break
-					case 'aliceblue':
-						pair.bodyA.render.fillStyle = 'lightgreen'
-						break
-					case 'lightgreen':
-						pair.bodyA.render.fillStyle = 'gold'
-						break
-					case 'gold':
-						pair.bodyA.render.fillStyle = 'olive'
-						break
-				}
-
-				score += 1
-				scoreDisplay.innerHTML = score
-				break
-			}
-	}
+	doCollision(event)
 });
