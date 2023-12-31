@@ -5,6 +5,7 @@ html, body {
 	padding: 0;
 	font-family: system-ui, sans-serif;
 	font-weight: bold;
+	background-color: lightgrey;
 }
 
 #ui-outer {
@@ -58,4 +59,13 @@ html, body {
 	#ui-container {
 		top: calc(50vh - 450px);
 	}
+}
+
+#links {
+	pointer-events: auto;
+	position: absolute;
+	bottom: 1em;
+	font-weight: normal;
+	width: 100%;
+	text-align: center;
 }

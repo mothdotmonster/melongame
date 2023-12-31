@@ -215,7 +215,7 @@ function doCollision(event){
 		if (pair.bodyA.label == 'deathplane' || pair.bodyB.label == 'deathplane') {
 			Runner.stop(runner) // stop game
 			nextDisplay.innerHTML = "game over" // let the player know what happen
-			uiOuter.style.cssText += 'background-image: linear-gradient(0deg, lightgrey 16.67%, transparent 16.67%, transparent 50%, lightgrey 50%, lightgrey 66.67%, transparent 66.67%, transparent 100%); background-size: 12.00px 12.00px;;'
+			uiOuter.style.cssText += 'background-image: linear-gradient(0deg, white 16.67%, transparent 16.67%, transparent 50%, white 50%, white 66.67%, transparent 66.67%, transparent 100%); background-size: 12.00px 12.00px;;'
 		}
 	}
 }
